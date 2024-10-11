@@ -1,6 +1,6 @@
 # react-datagrid-compare
 ### 비교 대상 라이브러리
-* Tanstack React Table
+* Tanstack React Table [DOCS](https://tanstack.com/table/latest/docs/guide/data) [EXAMPLE](https://tanstack.com/table/v8/docs/framework/react/examples/basic)
 * MUI X Data Grid [DOCS](https://mui.com/x/react-data-grid/)
 * AG Grid
 * React Data Grid [DOCS](https://github.com/adazzle/react-data-grid#readme)
