@@ -166,7 +166,7 @@ const RD: React.FC = () => {
       sortColumns={sortColumns}
       onSortColumnsChange={setSortColumns}
       rowKeyGetter={(row) => row.id}
-      className="fill-grid"
+      className="fill-grid rdg-light"
     />
   );
 }
