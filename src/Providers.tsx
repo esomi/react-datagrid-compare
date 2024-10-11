@@ -1,6 +1,7 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Layouts from "@src/Layouts.tsx";
 import RD from "@pages/RD.tsx";
+import Material from "@pages/Material.tsx";
 
 const router = createBrowserRouter([
   {
@@ -8,8 +9,7 @@ const router = createBrowserRouter([
     element: <Layouts/>,
     children: [
       {index: true, path: "/grid1", element: <RD/>},
-      {index: true, path: "/grid2", element: <RD/>},
-      {index: true, path: "/grid3", element: <RD/>},
+      {index: true, path: "/grid5", element: <Material/>},
     ],
   },
 ]);
