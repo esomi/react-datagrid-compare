@@ -8,7 +8,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layouts/>,
     children: [
-      {index: true, path: "/grid1", element: <RD/>},
+      {index: true, path: "/grid4", element: <RD/>},
       {index: true, path: "/grid5", element: <Material/>},
     ],
   },
