@@ -1,15 +1,14 @@
-import './App.css'
-import {Breadcrumb, ConfigProvider, Layout, Menu, theme} from "antd";
+import {ConfigProvider, Layout, Menu, theme} from "antd";
 import {Link, Outlet} from "react-router-dom";
 
 const {Header, Content, Footer} = Layout;
 
-const items = new Array(3).fill(null).map((_, index) => ({
-  key: index + 1,
-  label: <Link to={`/nav${index + 1}`}>nav {index + 1}</Link>,
-}));
-
-const breadcrumbItems = [{title: 'Home'}, {title: 'List'}, {title: 'Layouts'}];
+const items = ['Grid1', 'Grid2', 'Grid3'].map((item, index) => {
+  return {
+    key: index + 1,
+    label: <Link to={`/grid${index + 1}`}>{item}</Link>,
+  }
+});
 
 function Layouts() {
   const {
@@ -44,14 +43,13 @@ function Layouts() {
               <Menu
                 mode="horizontal"
                 theme="dark"
-                defaultSelectedKeys={['2']}
+                defaultSelectedKeys={['1']}
                 items={items}
                 style={{flex: 1, minWidth: 0}}
               />
             </ConfigProvider>
           </Header>
-          <Content style={{padding: '0 48px'}}>
-            <Breadcrumb style={{margin: '16px 0'}} items={breadcrumbItems}/>
+          <Content style={{padding: '32px'}}>
             <div
               style={{
                 background: colorBgContainer,

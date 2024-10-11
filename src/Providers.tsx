@@ -1,15 +1,15 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Layouts from "@src/Layouts.tsx";
-import {Home} from "@pages/Home.tsx";
+import RD from "@pages/RD.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layouts/>,
     children: [
-      {index: true, path: "/nav1", element: <Home/>},
-      {index: true, path: "/nav2", element: <Home/>},
-      {index: true, path: "/nav3", element: <Home/>},
+      {index: true, path: "/grid1", element: <RD/>},
+      {index: true, path: "/grid2", element: <RD/>},
+      {index: true, path: "/grid3", element: <RD/>},
     ],
   },
 ]);
