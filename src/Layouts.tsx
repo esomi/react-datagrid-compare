@@ -3,7 +3,7 @@ import {Link, Outlet} from "react-router-dom";
 
 const {Header, Content, Footer} = Layout;
 
-const items = ['1','2','4', '5'].map((item, index) => {
+const items = ['1','2','3','4','5'].map((item, index) => {
   return {
     key: index + 1,
     label: <Link to={`/grid${item}`}><span>Grid {item}</span></Link>,
