@@ -1,6 +1,18 @@
 import Box from '@mui/material/Box';
-import {DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport} from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridCsvExportOptions,
+  GridCsvGetRowsToExportParams,
+  gridExpandedSortedRowIdsSelector,
+  gridPaginatedVisibleSortedGridRowIdsSelector, gridSortedRowIdsSelector,
+  GridToolbarContainer,
+  // GridToolbarExport,
+  useGridApiContext
+} from '@mui/x-data-grid';
 import './MUI.css';
+import {Button} from "@mui/material";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
   { field: 'id', headerName: 'ID', width: 90 },
@@ -46,10 +58,48 @@ const rows = [
   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
+function CustomToolbar() {
+  const apiRef = useGridApiContext();
+
+  const handleExport = (options: GridCsvExportOptions) =>
+    apiRef.current.exportDataAsCsv(options);
+
+  const getRowsFromCurrentPage = ({apiRef}: GridCsvGetRowsToExportParams) =>
+    gridPaginatedVisibleSortedGridRowIdsSelector(apiRef);
+
+  const getUnfilteredRows = ({apiRef}: GridCsvGetRowsToExportParams) =>
+    gridSortedRowIdsSelector(apiRef);
+
+  const getFilteredRows = ({apiRef}: GridCsvGetRowsToExportParams) =>
+    gridExpandedSortedRowIdsSelector(apiRef);
+
+  return (
+    <GridToolbarContainer>
+      <Button
+        startIcon={<FileDownloadIcon />}
+        onClick={() => handleExport({getRowsToExport: getRowsFromCurrentPage})}
+      >
+        Current page rows
+      </Button>
+      <Button
+        startIcon={<FileDownloadIcon />}
+        onClick={() => handleExport({getRowsToExport: getFilteredRows})}
+      >
+        Filtered rows
+      </Button>
+      <Button
+        startIcon={<FileDownloadIcon />}
+        onClick={() => handleExport({getRowsToExport: getUnfilteredRows})}
+      >
+        Unfiltered rows
+      </Button>
+    </GridToolbarContainer>
+  );
+}
+
 export default function MUI() {
   return (
     <Box sx={{ height: 400, width: '100%' }}>
-      {/*<GridToolbarExport />*/}
       <DataGrid
         rows={rows}
         columns={columns}
@@ -66,13 +116,7 @@ export default function MUI() {
         columnHeaderHeight={35}
         rowHeight={32}
         getRowClassName={(params) => `super-app-theme--${params.row.age! > 21 ? 'adult' : 'child'}`}
-        slots={{
-          toolbar: () => (
-            <GridToolbarContainer>
-              <GridToolbarExport />
-            </GridToolbarContainer>
-          ),
-        }}
+        slots={{ toolbar: CustomToolbar }}
       />
     </Box>
   );
