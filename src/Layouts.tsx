@@ -1,30 +1,41 @@
 import {ConfigProvider, Layout, Menu, theme} from "antd";
-import {Link, Outlet} from "react-router-dom";
+import {Link, Outlet, useLocation} from "react-router-dom";
+import {useMemo} from "react";
+import './Layouts.css';
 
 const {Header, Content, Footer} = Layout;
 
 const titleList = [
-  { title: 'Grid 1', subtitle: 'Tanstack React Table' },
-  { title: 'Grid 2', subtitle: 'MUI X Data Grid' },
-  { title: 'Grid 3', subtitle: 'AG Grid React' },
-  { title: 'Grid 4', subtitle: 'React Data Grid' },
-  { title: 'Grid 5', subtitle: 'Material React Table' }
+  { key: '1', title: 'Tanstack React Table' },
+  { key: '2', title: 'MUI X Data Grid' },
+  { key: '3', title: 'AG React' },
+  { key: '4', title: 'React Data Grid' },
+  { key: '5', title: 'Material React Table' }
 ];
 
 const items = titleList.map((item, index) => {
   return {
-    key: index + 1,
+    key: item.key,
     label: (
-      <Link to={`/grid${index + 1}`}>
-        <small>{item.title}</small>
-        <span style={{margin: '0 4px'}}> | </span>
-        <b>{item.subtitle}</b>
+      <Link to={`/grid${index + 1}`} className="menu-item">
+        <div className="menu-item-key">GRID {item.key}</div>
+        <div className="menu-item-title">{item.title}</div>
       </Link>
     )
   };
 });
 
+
 function Layouts() {
+  const location = useLocation();
+
+  const selectedKey = useMemo(() => {
+    const path = location.pathname;
+    const match = path.match(/\/grid(\d+)/);
+    return match ? match[1] : '1';
+  }, [location.pathname]);
+
+
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
@@ -58,6 +69,7 @@ function Layouts() {
                 mode="horizontal"
                 theme="dark"
                 defaultSelectedKeys={['1']}
+                selectedKeys={[selectedKey]}
                 items={items}
                 style={{flex: 1, minWidth: 0}}
               />
