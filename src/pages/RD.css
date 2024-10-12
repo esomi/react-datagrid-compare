@@ -21,3 +21,10 @@
   border: 2px solid #ccc;
   vertical-align: top;
 }
+
+.export-btn-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-block-end: 8px;
+}

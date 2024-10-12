@@ -1,7 +1,18 @@
 import React, {useState} from 'react';
-import DataGrid, {Column, CopyEvent, FillEvent, PasteEvent, Row, SelectColumn, textEditor} from 'react-data-grid';
+import DataGrid, {
+  Column,
+  CopyEvent,
+  DataGridHandle,
+  FillEvent,
+  PasteEvent,
+  Row,
+  SelectColumn,
+  textEditor
+} from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
 import './RD.css';
+import {flushSync} from "react-dom";
+import {exportToCsv, exportToPdf} from "@src/utils/exportUtils.tsx";
 
 interface Row {
   id: number;
@@ -94,11 +105,8 @@ function DateEditor<TRow extends { [key: string]: any }>({ row, column, onRowCha
 const RD: React.FC = () => {
   const [rows, setRows] = useState<Row[]>(initialRows);
   const [selectedRows, setSelectedRows] = useState<ReadonlySet<number>>(new Set());
-
-  // const onSelectedRowsChange = (selectedRows: ReadonlySet<number>) => {
-  //   console.log(selectedRows);
-  //   setSelectedRows(selectedRows);
-  // };
+  const [isExporting, setIsExporting] = useState(false);
+  const gridRef = React.useRef<DataGridHandle>(null);
 
   function handleFill({ columnKey, sourceRow, targetRow }: FillEvent<Row>): Row {
     return { ...targetRow, [columnKey]: sourceRow[columnKey as keyof Row] };
@@ -130,32 +138,79 @@ const RD: React.FC = () => {
     }
   }
 
+  // 직접 구현 시
+  /*const _handleExportToCsv = () => {
+    const csv = rows.map(row => Object.values(row).join(',')).join('\n');
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }*/
+
+  // exportUtils.tsx(git code) 사용 시
+  function handleExportToCsv() {
+    flushSync(() => {
+      setIsExporting(true);
+    });
+
+    exportToCsv(gridRef.current!.element!, 'MyTasks.csv');
+    // https://github.com/adazzle/react-data-grid/blob/main/website/exportUtils.tsx
+    flushSync(() => {
+      setIsExporting(false);
+    });
+  }
+  async function handleExportToPdf() {
+    flushSync(() => {
+      setIsExporting(true);
+    });
+
+    await exportToPdf(gridRef.current!.element!, 'MyTasks.pdf');
+
+    flushSync(() => {
+      setIsExporting(false);
+    });
+  }
 
   return (
-    <DataGrid
-      columns={columns}
-      rows={rows}
-      onFill={handleFill}
-      onCopy={handleCopy}
-      onPaste={handlePaste}
-      selectedRows={selectedRows}
-      onSelectedRowsChange={setSelectedRows}
-      // onSelectedRowsChange={onSelectedRowsChange} // TESTING
-      onRowsChange={setRows}
-      rowKeyGetter={(row) => row.id}
-      className="fill-grid rdg-light"
-      rowHeight={30}
-      isRowSelectionDisabled={(row) => row.id === 0}
-      rowClass={(row) =>
-        row.id === 1 ? 'highlight-row' : undefined
-      }
-      onCellClick={(args, event) => {
-        if (args.column.key === 'title') {
-          event.preventGridDefault();
-          args.selectCell(true);
+    <>
+      <div className="export-btn-group">
+        <button type="button" onClick={handleExportToCsv}>
+          Export to CSV
+        </button>
+        <button type="button" onClick={handleExportToPdf}>
+          Export to PDF
+        </button>
+      </div>
+      <DataGrid
+        ref={gridRef}
+        columns={columns}
+        rows={rows}
+        onFill={handleFill}
+        onCopy={handleCopy}
+        onPaste={handlePaste}
+        selectedRows={selectedRows}
+        onSelectedRowsChange={setSelectedRows}
+        // onSelectedRowsChange={onSelectedRowsChange} // TESTING
+        onRowsChange={setRows}
+        rowKeyGetter={(row) => row.id}
+        className="fill-grid rdg-light"
+        rowHeight={30}
+        isRowSelectionDisabled={(row) => row.id === 0}
+        rowClass={(row) =>
+          row.id === 1 ? 'highlight-row' : undefined
         }
-      }}
-    />
+        onCellClick={(args, event) => {
+          if (args.column.key === 'title') {
+            event.preventGridDefault();
+            args.selectCell(true);
+          }
+        }}
+        enableVirtualization={!isExporting}
+      />
+    </>
   );
 }
 
