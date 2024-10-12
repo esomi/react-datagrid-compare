@@ -1,3 +1,23 @@
 .selected-row {
   background-color: blue;
 }
+
+.highlight-row {
+  background-color: #9370db;
+  color: white;
+}
+
+.highlight-row:hover {
+  background-color: #800080;
+}
+
+.rdg-text-editor {
+  appearance: none;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  padding-block: 0;
+  padding-inline: 6px;
+  border: 2px solid #ccc;
+  vertical-align: top;
+}

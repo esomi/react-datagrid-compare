@@ -1,7 +1,8 @@
-import React, {useState, useMemo, Key, useEffect} from 'react';
-import DataGrid, { Column, Row, Renderers, SortColumn, RenderCheckboxProps, RenderRowProps } from 'react-data-grid';
+import React, {useState} from 'react';
+import DataGrid, {Column, CopyEvent, FillEvent, PasteEvent, Row, SelectColumn, textEditor} from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
 import './RD.css';
+
 interface Row {
   id: number;
   title: string;
@@ -12,6 +13,7 @@ interface Row {
 }
 
 const columns: Column<Row>[] = [
+  SelectColumn,
   {
     key: 'id',
     name: 'ID',
@@ -21,20 +23,10 @@ const columns: Column<Row>[] = [
   {
     key: 'title',
     name: 'Title',
-    renderEditCell: TextEditor,
+    renderEditCell: textEditor,
     editable: true,
     sortable: true,
     resizable: true,
-  },
-  {
-    key: 'complete',
-    name: 'Complete',
-    renderCell: ({ row }: { row: Row }) => (
-      <>{row.complete ? '✅' : '❌'}</>
-    ),
-    renderEditCell: BooleanEditor,
-    editable: true,
-    sortable: true,
   },
   {
     key: 'priority',
@@ -46,7 +38,7 @@ const columns: Column<Row>[] = [
   {
     key: 'description',
     name: 'Description',
-    renderEditCell: TextEditor,
+    renderEditCell: textEditor,
     editable: true,
     sortable: true,
   },
@@ -74,28 +66,11 @@ interface EditorProps<TRow> {
   onRowChange: (row: TRow) => void;
 }
 
-function TextEditor<TRow extends { [key: string]: any }>({ row, column, onRowChange }: EditorProps<TRow>) {
-  return (
-    <input
-      value={row[column.key as keyof TRow] as string}
-      onChange={(e) => onRowChange({ ...row, [column.key]: e.target.value })}
-    />
-  );
-}
-
-function BooleanEditor<TRow extends { [key: string]: any }>({ row, column, onRowChange }: EditorProps<TRow>) {
-  return (
-    <input
-      type="checkbox"
-      checked={row[column.key as keyof TRow] as boolean}
-      onChange={(e) => onRowChange({ ...row, [column.key]: e.target.checked })}
-    />
-  );
-}
-
 function PriorityEditor<TRow extends { [key: string]: any }>({ row, column, onRowChange }: EditorProps<TRow>) {
   return (
     <select
+      className={'rdg-text-editor'}
+      autoFocus
       value={row[column.key as keyof TRow] as string}
       onChange={(e) => onRowChange({ ...row, [column.key]: e.target.value })}
     >
@@ -119,54 +94,67 @@ function DateEditor<TRow extends { [key: string]: any }>({ row, column, onRowCha
 const RD: React.FC = () => {
   const [rows, setRows] = useState<Row[]>(initialRows);
   const [selectedRows, setSelectedRows] = useState<ReadonlySet<number>>(new Set());
-  const [sortColumns, setSortColumns] = useState<SortColumn[]>([]);
 
-  useEffect(() => {
-    console.log('Rows:', rows);
-    console.log('Selected Rows:', selectedRows);
-  }, []);
+  // const onSelectedRowsChange = (selectedRows: ReadonlySet<number>) => {
+  //   console.log(selectedRows);
+  //   setSelectedRows(selectedRows);
+  // };
 
-  const sortedRows = useMemo(() => {
-    if (sortColumns.length === 0) return rows;
-    return [...rows].sort((a, b) => {
-      for (const sort of sortColumns) {
-        const comparator = (a: Row, b: Row) => {
-          if (a[sort.columnKey as keyof Row] === b[sort.columnKey as keyof Row]) return 0;
-          return a[sort.columnKey as keyof Row] > b[sort.columnKey as keyof Row] ? 1 : -1;
-        };
-        const compResult = comparator(a, b);
-        if (compResult !== 0) {
-          return sort.direction === 'ASC' ? compResult : -compResult;
-        }
-      }
-      return 0;
-    });
-  }, [rows, sortColumns]);
+  function handleFill({ columnKey, sourceRow, targetRow }: FillEvent<Row>): Row {
+    return { ...targetRow, [columnKey]: sourceRow[columnKey as keyof Row] };
+  }
 
-  const renderers: Renderers<Row,unknown> = {
-    renderCheckbox: (props: RenderCheckboxProps) => (
-      <input
-        type="checkbox"
-        checked={props.checked}
-      />
-    ),
-    renderRow: (key: Key, props: RenderRowProps<Row>) => (
-      <Row {...props} key={key} className={selectedRows.has(props.row.id) ? 'selected-row' : ''} />
-    )
-  };
+  function handlePaste({
+                         sourceColumnKey,
+                         sourceRow,
+                         targetColumnKey,
+                         targetRow
+                       }: PasteEvent<Row>): Row {
+    const incompatibleColumns = ['email', 'zipCode', 'date'];
+    if (
+      sourceColumnKey === 'avatar' ||
+      ['id', 'avatar'].includes(targetColumnKey) ||
+      ((incompatibleColumns.includes(targetColumnKey) ||
+          incompatibleColumns.includes(sourceColumnKey)) &&
+        sourceColumnKey !== targetColumnKey)
+    ) {
+      return targetRow;
+    }
+
+    return { ...targetRow, [targetColumnKey]: sourceRow[sourceColumnKey as keyof Row] };
+  }
+
+  function handleCopy({sourceRow, sourceColumnKey}: CopyEvent<Row>): void {
+    if (window.isSecureContext) {
+      navigator.clipboard.writeText(sourceRow[sourceColumnKey as keyof Row] as string);
+    }
+  }
+
 
   return (
     <DataGrid
       columns={columns}
-      rows={sortedRows}
-      renderers={renderers}
+      rows={rows}
+      onFill={handleFill}
+      onCopy={handleCopy}
+      onPaste={handlePaste}
       selectedRows={selectedRows}
       onSelectedRowsChange={setSelectedRows}
+      // onSelectedRowsChange={onSelectedRowsChange} // TESTING
       onRowsChange={setRows}
-      sortColumns={sortColumns}
-      onSortColumnsChange={setSortColumns}
       rowKeyGetter={(row) => row.id}
       className="fill-grid rdg-light"
+      rowHeight={30}
+      isRowSelectionDisabled={(row) => row.id === 0}
+      rowClass={(row) =>
+        row.id === 1 ? 'highlight-row' : undefined
+      }
+      onCellClick={(args, event) => {
+        if (args.column.key === 'title') {
+          event.preventGridDefault();
+          args.selectCell(true);
+        }
+      }}
     />
   );
 }
