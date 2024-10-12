@@ -3,12 +3,11 @@
 }
 
 .highlight-row {
-  background-color: #9370db;
-  color: white;
+  background-color: rgb(228, 237, 250);
 }
 
 .highlight-row:hover {
-  background-color: #800080;
+  background-color: rgb(216, 226, 255);
 }
 
 .rdg-text-editor {

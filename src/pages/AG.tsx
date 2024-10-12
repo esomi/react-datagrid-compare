@@ -3,7 +3,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import {useState} from "react";
 import {ColDef} from "ag-grid-community"; // Optional Theme applied to the Data Grid
-
+import './AG.css';
 export const AG = () => {
   // Row Data: The data to be displayed.
   const [rowData] = useState([

@@ -8,7 +8,7 @@ const {Header, Content, Footer} = Layout;
 const titleList = [
   { key: '1', title: 'Tanstack React Table' },
   { key: '2', title: 'MUI X Data Grid' },
-  { key: '3', title: 'AG React' },
+  { key: '3', title: 'AG Grid React' },
   { key: '4', title: 'React Data Grid' },
   { key: '5', title: 'Material React Table' }
 ];

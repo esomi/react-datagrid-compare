@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import './MUI.css';
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
   { field: 'id', headerName: 'ID', width: 90 },
@@ -21,6 +22,7 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
     type: 'number',
     width: 110,
     editable: true,
+    headerClassName: 'super-app-header',
   },
   {
     field: 'fullName',
@@ -60,6 +62,11 @@ export default function MUI() {
         pageSizeOptions={[5]}
         checkboxSelection
         disableRowSelectionOnClick
+        columnHeaderHeight={35}
+        rowHeight={32}
+        // getRowClassName={(params) => `super-app-theme--${params.row.age}`}
+        getRowClassName={(params) => `super-app-theme--${params.row.age! > 21 ? 'adult' : 'child'}`}
+        // https://mui.com/x/react-data-grid/style/
       />
     </Box>
   );

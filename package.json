@@ -14,7 +14,6 @@
     "@tanstack/react-table": "^8.20.5",
     "ag-grid-community": "^32.2.2",
     "ag-grid-react": "^32.2.2",
-    "antd": "^5.20.0",
     "export-to-csv": "^1.4.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.3",

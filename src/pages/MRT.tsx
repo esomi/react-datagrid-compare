@@ -1,17 +1,10 @@
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-  type MRT_Row,
-  createMRTColumnHelper,
-} from 'material-react-table';
-import { Box, Button } from '@mui/material';
+import {createMRTColumnHelper, MaterialReactTable, type MRT_Row, useMaterialReactTable,} from 'material-react-table';
+import {Box, Button} from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your library of choice here
-import { data, type Person } from '../utils/makeData';
+import {download, generateCsv, mkConfig} from 'export-to-csv'; //or use your library of choice here
+import {data, type Person} from '../utils/makeData';
 import autoTable from "jspdf-autotable";
 import jsPDF from "jspdf";
-
-;
 
 const columnHelper = createMRTColumnHelper<Person>();
 
@@ -74,20 +67,33 @@ const MRT = () => {
   const table = useMaterialReactTable({
     columns,
     data,
+    enableStickyHeader: true,
     enableRowSelection: true,
     columnFilterDisplayMode: 'popover',
     paginationDisplayMode: 'pages',
     positionToolbarAlertBanner: 'bottom',
+    initialState: {
+        density: 'compact',
+    },
+
+    muiTableHeadCellProps: {
+      //simple styling with the `sx` prop, works just like a style prop in this example
+      sx: {
+        backgroundColor: '#f9f9f9',
+      },
+    },
+
     renderTopToolbarCustomActions: ({ table }) => (
       <div>
         <Box
           sx={{
             display: 'flex',
+            alignItems: 'center',
             gap: '16px',
-            padding: '8px',
             flexWrap: 'wrap',
           }}
         >
+          <b>CSV</b>
           <Button
             //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
             onClick={handleExportData}
@@ -127,11 +133,12 @@ const MRT = () => {
         <Box
           sx={{
             display: 'flex',
+            alignItems: 'center',
             gap: '16px',
-            padding: '8px',
             flexWrap: 'wrap',
           }}
         >
+          <b>PDF</b>
           <Button
             disabled={table.getPrePaginationRowModel().rows.length === 0}
             //export all rows, including from the next page, (still respects filtering and sorting)
