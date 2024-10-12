@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import {DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport} from '@mui/x-data-grid';
 import './MUI.css';
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
@@ -49,6 +49,7 @@ const rows = [
 export default function MUI() {
   return (
     <Box sx={{ height: 400, width: '100%' }}>
+      {/*<GridToolbarExport />*/}
       <DataGrid
         rows={rows}
         columns={columns}
@@ -64,9 +65,14 @@ export default function MUI() {
         disableRowSelectionOnClick
         columnHeaderHeight={35}
         rowHeight={32}
-        // getRowClassName={(params) => `super-app-theme--${params.row.age}`}
         getRowClassName={(params) => `super-app-theme--${params.row.age! > 21 ? 'adult' : 'child'}`}
-        // https://mui.com/x/react-data-grid/style/
+        slots={{
+          toolbar: () => (
+            <GridToolbarContainer>
+              <GridToolbarExport />
+            </GridToolbarContainer>
+          ),
+        }}
       />
     </Box>
   );
