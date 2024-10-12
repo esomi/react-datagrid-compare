@@ -3,11 +3,25 @@ import {Link, Outlet} from "react-router-dom";
 
 const {Header, Content, Footer} = Layout;
 
-const items = ['1','2','3','4','5'].map((item, index) => {
+const titleList = [
+  { title: 'Grid 1', subtitle: 'Tanstack React Table' },
+  { title: 'Grid 2', subtitle: 'MUI X Data Grid' },
+  { title: 'Grid 3', subtitle: 'AG Grid React' },
+  { title: 'Grid 4', subtitle: 'React Data Grid' },
+  { title: 'Grid 5', subtitle: 'Material React Table' }
+];
+
+const items = titleList.map((item, index) => {
   return {
     key: index + 1,
-    label: <Link to={`/grid${item}`}><span>Grid {item}</span></Link>,
-  }
+    label: (
+      <Link to={`/grid${index + 1}`}>
+        <small>{item.title}</small>
+        <span style={{margin: '0 4px'}}> | </span>
+        <b>{item.subtitle}</b>
+      </Link>
+    )
+  };
 });
 
 function Layouts() {
@@ -35,7 +49,7 @@ function Layouts() {
                   Menu: {
                     darkItemBg: 'rgb(61 61 61)',
                     darkItemSelectedBg: 'rgb(110 150 214)',
-                    padding: 100,
+                    padding: 80,
                   },
                 },
               }}
