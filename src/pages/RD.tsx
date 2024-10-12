@@ -193,7 +193,6 @@ const RD: React.FC = () => {
         onPaste={handlePaste}
         selectedRows={selectedRows}
         onSelectedRowsChange={setSelectedRows}
-        // onSelectedRowsChange={onSelectedRowsChange} // TESTING
         onRowsChange={setRows}
         rowKeyGetter={(row) => row.id}
         className="fill-grid rdg-light"
