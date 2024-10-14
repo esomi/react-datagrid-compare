@@ -1,10 +1,11 @@
 import {createMRTColumnHelper, MaterialReactTable, type MRT_Row, useMaterialReactTable,} from 'material-react-table';
-import {Box, Button} from '@mui/material';
+import {Box, Button, createTheme, darken, lighten, Switch, ThemeProvider} from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {download, generateCsv, mkConfig} from 'export-to-csv'; //or use your library of choice here
 import {data, type Person} from '../utils/makeData';
 import autoTable from "jspdf-autotable";
 import jsPDF from "jspdf";
+import {useMemo, useState} from "react";
 
 const columnHelper = createMRTColumnHelper<Person>();
 
@@ -41,6 +42,7 @@ const csvConfig = mkConfig({
 });
 
 const MRT = () => {
+  const [isDark, setIsDark] = useState(false);
   const handleExportData = () => {
     const csv = generateCsv(csvConfig)(data);
     download(csvConfig)(csv);
@@ -64,6 +66,27 @@ const MRT = () => {
     doc.save('mrt-pdf-example.pdf');
   };
 
+  // const globalTheme = useTheme(); //(optional) if you already have a theme defined in your app root, you can import here
+  const tableTheme = useMemo(
+  () =>
+      createTheme({
+        palette: {
+          mode: isDark ? 'dark' : 'light',
+          background: {
+            default: isDark ? '#000' : '#fff',
+          },
+        },
+      }),
+    [isDark],
+  );
+
+  //light or dark green
+  const baseBackgroundColor =
+    // globalTheme.palette.mode === 'dark'
+    isDark
+      ? 'rgba(3, 44, 43, 1)'
+      : 'rgba(244, 255, 233, 1)';
+
   const table = useMaterialReactTable({
     columns,
     data,
@@ -75,16 +98,42 @@ const MRT = () => {
     initialState: {
         density: 'compact',
     },
-
-    muiTableHeadCellProps: {
-      //simple styling with the `sx` prop, works just like a style prop in this example
-      sx: {
-        backgroundColor: '#f9f9f9',
-      },
+    muiTableBodyProps: {
+      // @ts-ignore
+      sx: (globalTheme) => ({
+        '& tr:nth-of-type(odd):not([data-selected="true"]):not([data-pinned="true"]) > td':
+          {
+            backgroundColor: darken(baseBackgroundColor, 0.1),
+          },
+        '& tr:nth-of-type(odd):not([data-selected="true"]):not([data-pinned="true"]):hover > td':
+          {
+            backgroundColor: darken(baseBackgroundColor, 0.2),
+          },
+        '& tr:nth-of-type(even):not([data-selected="true"]):not([data-pinned="true"]) > td':
+          {
+            backgroundColor: lighten(baseBackgroundColor, 0.1),
+          },
+        '& tr:nth-of-type(even):not([data-selected="true"]):not([data-pinned="true"]):hover > td':
+          {
+            backgroundColor: darken(baseBackgroundColor, 0.2),
+          },
+      }),
     },
+    mrtTheme: (theme) => ({
+      baseBackgroundColor: baseBackgroundColor,
+      draggingBorderColor: theme.palette.secondary.main,
+    }),
+
+    // muiTableHeadCellProps: {
+    //   //simple styling with the `sx` prop, works just like a style prop in this example
+    //   sx: {
+    //     backgroundColor: '#f9f9f9',
+    //   },
+    // },
 
     renderTopToolbarCustomActions: ({ table }) => (
       <div>
+        <Switch checked={isDark} onChange={() => setIsDark(!isDark)} />
         <Box
           sx={{
             display: 'flex',
@@ -172,7 +221,12 @@ const MRT = () => {
     ),
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <ThemeProvider theme={tableTheme}>
+      <MaterialReactTable table={table} />
+    </ThemeProvider>
+    // <MaterialReactTable table={table} />
+  );
 };
 
 export default MRT;
